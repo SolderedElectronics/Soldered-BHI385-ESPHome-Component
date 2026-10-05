@@ -1,0 +1,3 @@
+version: "1.0.0"
+description: "Bosch BHI385 SensorAPI and bsxsam firmware image, used by the Soldered BHI385 ESPHome component"
+url: "https://github.com/SolderedElectronics/Soldered-BHI385-ESPHome-Component"

@@ -1,5 +1,8 @@
+# Reads acceleration, angular rate, orientation (quaternion and roll/pitch/yaw) and step count from the
+# Soldered BHI385 Smart IMU breakout once per update_interval.
+
 esphome:
-  name: soldered-esphome-component-template-test
+  name: bhi385-basic
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -7,12 +10,56 @@ esp32:
     type: esp-idf
 
 logger:
-  level: DEBUG
+  # Since ESPHome 2026.9 sensor/event state changes are only logged at VERBOSE.
+  level: VERBOSE
+  hardware_uart: UART0
+  logs:
+    # Per-transaction I2C logs would flood the UART, the firmware upload alone is several hundred writes.
+    i2c: DEBUG
 
 external_components:
   - source:
       type: local
       path: ../components
-    components: [soldered_esphome_component_template]
+    components: [bhi385]
 
-soldered_esphome_component_template:
+i2c:
+  sda: GPIO8
+  scl: GPIO9
+  # 400 kHz cuts the ~80 KB firmware upload done on every boot from several seconds to about two.
+  frequency: 400kHz
+  scan: true
+
+sensor:
+  - platform: bhi385
+    address: 0x29
+    update_interval: 1s
+    sample_rate: 50
+    accel_x:
+      name: "BHI385 Accel X"
+    accel_y:
+      name: "BHI385 Accel Y"
+    accel_z:
+      name: "BHI385 Accel Z"
+    gyro_x:
+      name: "BHI385 Gyro X"
+    gyro_y:
+      name: "BHI385 Gyro Y"
+    gyro_z:
+      name: "BHI385 Gyro Z"
+    quaternion_w:
+      name: "BHI385 Quaternion W"
+    quaternion_x:
+      name: "BHI385 Quaternion X"
+    quaternion_y:
+      name: "BHI385 Quaternion Y"
+    quaternion_z:
+      name: "BHI385 Quaternion Z"
+    roll:
+      name: "BHI385 Roll"
+    pitch:
+      name: "BHI385 Pitch"
+    yaw:
+      name: "BHI385 Yaw"
+    step_count:
+      name: "BHI385 Step Count"

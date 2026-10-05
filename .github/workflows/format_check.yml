@@ -20,4 +20,6 @@ jobs:
         run: pip install clang-format==13.0.1
 
       - name: Check formatting
-        run: find components -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror
+        # The vendored Bosch BHI385 SensorAPI (bhi385_sensorapi/bhi385* and the Bosch_* firmware image) is kept
+        # unmodified and is not formatted.
+        run: find components \( -name "*.cpp" -o -name "*.h" \) -not -path "*/bhi385_sensorapi/bhi385*" -not -name "Bosch_*" | xargs clang-format --dry-run --Werror

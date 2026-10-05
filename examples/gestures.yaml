@@ -1,0 +1,53 @@
+# Fires ESPHome events for single/double/triple taps and wrist gestures (shake/jiggle, flick in, flick out)
+# detected on the Soldered BHI385 Smart IMU breakout, and logs each one.
+
+esphome:
+  name: bhi385-gestures
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+logger:
+  # Since ESPHome 2026.9 sensor/event state changes are only logged at VERBOSE.
+  level: VERBOSE
+  hardware_uart: UART0
+  logs:
+    # Per-transaction I2C logs would flood the UART, the firmware upload alone is several hundred writes.
+    i2c: DEBUG
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components: [bhi385]
+
+i2c:
+  sda: GPIO8
+  scl: GPIO9
+  frequency: 400kHz
+  scan: true
+
+# The sensor platform entry owns the BHI385 configuration, include it even without any sensors.
+sensor:
+  - platform: bhi385
+    id: imu
+    address: 0x29
+
+event:
+  - platform: bhi385
+    type: tap
+    name: "BHI385 Tap"
+    on_event:
+      - logger.log:
+          format: "Tap: %s"
+          args: ["event_type.c_str()"]
+
+  - platform: bhi385
+    type: wrist_gesture
+    name: "BHI385 Wrist Gesture"
+    on_event:
+      - logger.log:
+          format: "Wrist gesture: %s"
+          args: ["event_type.c_str()"]
